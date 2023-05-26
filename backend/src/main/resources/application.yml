@@ -1,0 +1,40 @@
+security.jwt.token.secret-key: eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY4NDU1MDgzMSwiaWF0IjoxNjg0NTUwODMxfQ.rHMYnonLiVdf_rzexfQi6QBSswt4Fg9hpxZC6G7jvZU
+
+
+spring:
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+  datasource:
+    hikari:
+      minimumIdle: 2
+      maximumPoolSize: 10
+      idleTimeout: 120000
+      connectionTimeout: 300000
+      leakDetectionThreshold: 1_000_000
+    driver-class-name: org.postgresql.Driver
+    #url: jdbc:postgresql://dpg-cg478j9mbg5d883t87ag-a.oregon-postgres.render.com:5432/llapp_t41j
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: nauruz0304
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
+  sql:
+    init:
+      platform: postgres
+      mode: always
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /api-docs
+server:
+  jetty:
+    accesslog:
+      enabled: true
+  port: 8312
+

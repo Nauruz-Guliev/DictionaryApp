@@ -1,0 +1,10 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+$theme-colors: map-merge($theme-colors, (
+        "primary": #F45B69
+));
+
+
+@import "node_modules/bootstrap";
