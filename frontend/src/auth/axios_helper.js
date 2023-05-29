@@ -43,7 +43,7 @@ export const request = (method, url, data) => {
             headers: headers,
             url: url,
             data: data,
-            timeout : 10000
+            timeout : 30000
         }
     );
 }

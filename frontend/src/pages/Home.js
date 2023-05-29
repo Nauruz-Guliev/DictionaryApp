@@ -11,6 +11,7 @@ export default class Home extends React.Component {
         }
     }
     componentDidMount() {
+        /*
         request("GET", "/test", {
         })
             .then((response) => {
@@ -23,6 +24,8 @@ export default class Home extends React.Component {
             }).catch((error) => {
             console.log(error)
         })
+
+         */
     }
     render() {
         return (

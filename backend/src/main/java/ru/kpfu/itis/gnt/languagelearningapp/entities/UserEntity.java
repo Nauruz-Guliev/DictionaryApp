@@ -26,12 +26,17 @@ public class UserEntity {
     private String firstName;
     @Column(name = "last_name", nullable = false)
     private String lastName;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String login;
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_word",
+            joinColumns = @JoinColumn(name = "word_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<WordEntity> words = new HashSet<>();
 
 

@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Data
 @Transactional
 @Entity
-@Table(name = "translation")public class TranslationEntity {
+@Table(name = "translation")
+public class TranslationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,5 +26,5 @@ import org.springframework.transaction.annotation.Transactional;
     private String translation;
 
     private byte[] audio;
-    
+
 }

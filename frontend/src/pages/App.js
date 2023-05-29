@@ -24,7 +24,7 @@ function App() {
     const [redirect, setRedirect] = useState(null);
 
     useEffect(() => {
-        getUser().then(
+        let user = getUser().then(
             value => {
                 setUser(value);
             }
@@ -32,22 +32,22 @@ function App() {
             //setRedirect(true);
             navigate(AppEndPoints.LOGIN);
         });
-        setUser(getUser());
-    },[]);
+        setUser(user);
+    }, []);
 
     return (
         <UserContext.Provider value={[user, setUser]}>
             <div className="w-100">
                 <Header pageTitle="LLAPP" logoSrc={logo} user={user}/>
-                    <Routes>
-                        <Route exact path={AppEndPoints.HOME} element={<Home/>}></Route>
-                        <Route exact path={AppEndPoints.LOGIN} element={<Authentication/>}></Route>
-                        <Route exact path={AppEndPoints.TRANSLATION} element={<Translation/>}></Route>
-                        <Route exact path={AppEndPoints.PROFILE} element={<Profile/>}></Route>
-                        <Route exact path={AppEndPoints.DICTIONARY} element={<Dictionary/>}></Route>
-                        <Route exact path={AppEndPoints.FAVORITES} element={<FavoriteWords/>}></Route>
-                        <Route exact path={AppEndPoints.ERROR} element={<ErrorPage/>}></Route>
-                    </Routes>
+                <Routes>
+                    <Route exact path={AppEndPoints.HOME} element={<Home/>}></Route>
+                    <Route exact path={AppEndPoints.LOGIN} element={<Authentication/>}></Route>
+                    <Route exact path={AppEndPoints.TRANSLATION} element={<Translation/>}></Route>
+                    <Route exact path={AppEndPoints.PROFILE} element={<Profile/>}></Route>
+                    <Route exact path={AppEndPoints.DICTIONARY} element={<Dictionary/>}></Route>
+                    <Route exact path={AppEndPoints.FAVORITES} element={<FavoriteWords/>}></Route>
+                    <Route exact path={AppEndPoints.ERROR} element={<ErrorPage/>}></Route>
+                </Routes>
                 {redirect && <Navigate to={AppEndPoints.ERROR}/>}
             </div>
         </UserContext.Provider>

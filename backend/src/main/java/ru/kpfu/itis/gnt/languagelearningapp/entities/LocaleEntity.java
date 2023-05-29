@@ -22,9 +22,6 @@ public class LocaleEntity {
     private Long id;
     @Column(unique = true)
     private String text;
-
-    @OneToMany(mappedBy = "locale", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    private List<WordEntity> words;
-
+    
 
 }

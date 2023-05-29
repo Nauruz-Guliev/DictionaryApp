@@ -14,9 +14,11 @@ import ru.kpfu.itis.gnt.languagelearningapp.dto.CredentialsDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.SignUpDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.UserDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.UserUpdateDto;
+import ru.kpfu.itis.gnt.languagelearningapp.model.DictionaryModel;
 import ru.kpfu.itis.gnt.languagelearningapp.model.ErrorModel;
 import ru.kpfu.itis.gnt.languagelearningapp.model.SuccessModel;
-import ru.kpfu.itis.gnt.languagelearningapp.repository.WordRepository;
+import ru.kpfu.itis.gnt.languagelearningapp.model.dictionary.DictionaryItem;
+import ru.kpfu.itis.gnt.languagelearningapp.repository.DictionaryRepository;
 import ru.kpfu.itis.gnt.languagelearningapp.security.UserAuthProvider;
 import ru.kpfu.itis.gnt.languagelearningapp.services.DictionaryService;
 import ru.kpfu.itis.gnt.languagelearningapp.services.UserService;
@@ -60,39 +62,13 @@ public class UserController {
                 .body(userDto);
     }
 
-    @PostMapping(ApiEndPoints.Favorites.ADD)
-    public ResponseEntity<?> setFavorite(Authentication authentication,
-                                               HttpServletRequest request,
-                                               @RequestBody Long id) {
-        if(authentication == null || authentication.getPrincipal() == null) {
-            return createNotAuthenticatedMessage();
-        } else {
-            return ResponseEntity.ok(dictionaryService.addWordLike(id, (UserDto) authentication.getPrincipal()));
-        }
-    }
-
-
-    @PostMapping(ApiEndPoints.Favorites.REMOVE)
-    public ResponseEntity<?> deleteFavorite(Authentication authentication,
-                                         HttpServletRequest request,
-                                         @RequestBody Long id) {
-        if(authentication == null || authentication.getPrincipal() == null) {
-            return createNotAuthenticatedMessage();
-        } else {
-            return ResponseEntity.ok(dictionaryService.deleteWordLike(id, (UserDto) authentication.getPrincipal()));
-        }
-    }
-
-
-
     @PutMapping(ApiEndPoints.Authentication.PROFILE)
     public ResponseEntity<?> updateUser(@RequestBody UserUpdateDto user) {
-        service.updateUser(user);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(service.updateUser(user));
     }
 
     @GetMapping(ApiEndPoints.Authentication.PROFILE)
-    public ResponseEntity<?> getUserInfo(Authentication authentication, WordRepository wordRepository) {
+    public ResponseEntity<?> getUserInfo(Authentication authentication, DictionaryRepository dictionaryRepository) {
         if (authentication != null && authentication.isAuthenticated()) {
             UserDto user = (UserDto) authentication.getPrincipal();
             return ResponseEntity.ok(service.getUser(user.getId()));

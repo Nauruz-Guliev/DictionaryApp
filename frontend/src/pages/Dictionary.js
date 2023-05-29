@@ -129,7 +129,7 @@ async function ToggleFavorite(props) {
 async function RemoveFromFavorite(props) {
     let word = props;
     let result;
-    await request("POST", ApiEndPoints.REMOVE_FAVORITE, word.id)
+    await request("POST", ApiEndPoints.REMOVE_FAVORITE, word)
         .then((response) => {
             result = response.data;
         }).catch((error) => {
@@ -141,7 +141,7 @@ async function RemoveFromFavorite(props) {
 async function AddFavorite(props) {
     let word = props;
     let result;
-    await request("POST", ApiEndPoints.ADD_FAVORITE, word.id)
+    await request("POST", ApiEndPoints.ADD_FAVORITE, word)
         .then((response) => {
             result = response.data;
         }).catch((error) => {

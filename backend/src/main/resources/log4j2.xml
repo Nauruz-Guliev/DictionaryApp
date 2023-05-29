@@ -11,13 +11,14 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="com.example.log4j2demo" level="warn" additivity="false">
+        <Logger name="com.example.log4j2demo" level="trace" additivity="false">
             <AppenderRef ref="ConsoleAppender" />
         </Logger>
 
-        <Root level="trace">
+        <Root level="debug">
             <AppenderRef ref="ConsoleAppender" />
         </Root>
+
     </Loggers>
     <RollingFile name="FileAppender" fileName="logs/log4j2-demo.log"
                  filePattern="logs/log4j2-demo-%d{yyyy-MM-dd}-%i.log">

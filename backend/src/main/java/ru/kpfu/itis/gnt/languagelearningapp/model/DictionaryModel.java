@@ -15,6 +15,5 @@ import java.util.List;
 @Builder
 public class DictionaryModel {
     private List<DictionaryItem> dictionary;
-    private List<String> imageUrls;
     private byte[] audio;
 }

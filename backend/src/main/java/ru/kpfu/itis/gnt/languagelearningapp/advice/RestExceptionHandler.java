@@ -44,6 +44,6 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<ErrorModel> handleAnyException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorModel.builder().status(HttpStatus.INTERNAL_SERVER_ERROR.toString()).message(ErrorMessageConstants.INTERNAL.UNKNOWN + " " + ex.getMessage()).build());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorModel.builder().message(ErrorMessageConstants.INTERNAL.UNKNOWN + ": " + ex.getMessage()).build());
     }
 }

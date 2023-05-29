@@ -14,7 +14,7 @@ import ru.kpfu.itis.gnt.languagelearningapp.exception.AuthenticationException;
 import ru.kpfu.itis.gnt.languagelearningapp.exception.InvalidFieldDataException;
 import ru.kpfu.itis.gnt.languagelearningapp.mappers.mapstruct.UserMapper;
 import ru.kpfu.itis.gnt.languagelearningapp.repository.UserRepository;
-import ru.kpfu.itis.gnt.languagelearningapp.repository.WordRepository;
+import ru.kpfu.itis.gnt.languagelearningapp.repository.DictionaryRepository;
 
 import java.nio.CharBuffer;
 import java.util.Optional;
@@ -26,7 +26,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
-    private final WordRepository wordRepository;
 
     public UserDto findByLogin(String login) {
         UserEntity userEntity = userRepository.findByLogin(login)

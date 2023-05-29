@@ -23,18 +23,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
                     @Param("password") String password,
                     @Param("id") Long id);
 
-    @Query(value = "SELECT exists(SELECT * FROM user_word WHERE user_id =:userId AND word_id =:wordId)", nativeQuery = true)
-    boolean isFavorite(Long userId, Long wordId);
-
-    @Modifying(flushAutomatically = true)
-    @Transactional
-    @Query(value = "DELETE FROM user_word WHERE word_id =:wordId AND user_id =:userId", nativeQuery = true)
-    void removeWordFromFavorite(Long userId, Long wordId);
-
-    @Modifying(flushAutomatically = true)
-    @Transactional
-    @Query(value = "INSERT INTO user_word(word_id, user_id) VALUES (:wordId, :userId)", nativeQuery = true)
-    void addWordToFavorite(Long userId, Long wordId);
 
     @Modifying(flushAutomatically = true)
     @Transactional

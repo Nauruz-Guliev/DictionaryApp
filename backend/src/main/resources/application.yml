@@ -36,5 +36,5 @@ server:
   jetty:
     accesslog:
       enabled: true
-  port: 8312
+  port: 8181
 

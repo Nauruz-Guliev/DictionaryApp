@@ -21,27 +21,22 @@ public class WordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    @Column()
     private String text;
 
     @ManyToOne
     @JoinColumn(name = "locale_id")
     private LocaleEntity locale;
 
-    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "word", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageUrlEntity> images = new ArrayList<>();
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "word_type_id")
+    private WordTypeEntity type;
 
     @Column(name = "date_added")
     private Long dateAdded;
-
-
-    @ManyToMany
-    @JoinTable(
-            name = "user_word",
-            joinColumns = @JoinColumn(name = "word_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<UserEntity> users = new HashSet<>();
 
 
     @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

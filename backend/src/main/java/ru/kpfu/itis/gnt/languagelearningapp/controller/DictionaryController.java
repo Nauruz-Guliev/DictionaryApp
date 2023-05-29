@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,13 +23,10 @@ import ru.kpfu.itis.gnt.languagelearningapp.dto.UserDto;
 import ru.kpfu.itis.gnt.languagelearningapp.model.DictionaryModel;
 import ru.kpfu.itis.gnt.languagelearningapp.model.ErrorModel;
 import ru.kpfu.itis.gnt.languagelearningapp.model.PaginationModel;
-import ru.kpfu.itis.gnt.languagelearningapp.model.TranslationModel;
 import ru.kpfu.itis.gnt.languagelearningapp.model.dictionary.DictionaryItem;
 import ru.kpfu.itis.gnt.languagelearningapp.services.DictionaryService;
 
-import java.util.Dictionary;
 import java.util.List;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("api/v1/")
@@ -37,7 +35,7 @@ import java.util.Locale;
 })
 @RequiredArgsConstructor
 public class DictionaryController {
-    private final DictionaryService service;
+    private final DictionaryService dictionaryService;
 
 
     @Operation(summary = "Словарь")
@@ -52,7 +50,7 @@ public class DictionaryController {
     @PostMapping(ApiEndPoints.DICTIONARY)
     public ResponseEntity<?> getDictionary(@RequestBody TranslationDto dto, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            DictionaryModel dictionaryModel = service.getDictionaryModel(
+            DictionaryModel dictionaryModel = dictionaryService.getDictionaryModel(
                     dto, (UserDto) authentication.getPrincipal()
             );
             return ResponseEntity.ok(dictionaryModel);
@@ -64,7 +62,7 @@ public class DictionaryController {
     @GetMapping(ApiEndPoints.FAVORITES)
     public ResponseEntity<?> getFavorites(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            List<DictionaryItem> dictionaryItems = service.getUserWordEntityList(
+            List<DictionaryItem> dictionaryItems = dictionaryService.getUserWordEntityList(
                     (UserDto) authentication.getPrincipal()
             );
             return ResponseEntity.ok(dictionaryItems);
@@ -83,9 +81,30 @@ public class DictionaryController {
         }
     }
 
+    @PostMapping(ApiEndPoints.Favorites.ADD)
+    public ResponseEntity<?> setFavorite(Authentication authentication,
+                                         @RequestBody DictionaryItem model) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return createNotAuthenticatedMessage();
+        } else {
+            return ResponseEntity.ok(dictionaryService.addFavorite(model, (UserDto) authentication.getPrincipal()));
+        }
+    }
+
+
+    @PostMapping(ApiEndPoints.Favorites.REMOVE)
+    public ResponseEntity<?> deleteFavorite(Authentication authentication,
+                                            @RequestBody DictionaryItem model) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return createNotAuthenticatedMessage();
+        } else {
+            return ResponseEntity.ok(dictionaryService.deleteFavorite(model, (UserDto) authentication.getPrincipal()));
+        }
+    }
+
     private Page<DictionaryItem> findPaginated(int page, int pageSize, UserDto userDto) {
         Pageable pageable = PageRequest.of(page, pageSize <= 1 ? 5 : pageSize);
-        return service.findAll(pageable, userDto);
+        return dictionaryService.getUserWordEntityList(pageable, userDto);
     }
 
     private PaginationModel createModel(int page, Page<DictionaryItem> paginated) {
@@ -95,6 +114,13 @@ public class DictionaryController {
                 .itemPage(paginated.getContent())
                 .totalElements(paginated.getTotalElements())
                 .build();
+    }
+
+    private ResponseEntity<?> createNotAuthenticatedMessage() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorModel.builder()
+                .message(
+                        ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE
+                ).status(HttpStatus.FORBIDDEN.toString()).build());
     }
 
 }
