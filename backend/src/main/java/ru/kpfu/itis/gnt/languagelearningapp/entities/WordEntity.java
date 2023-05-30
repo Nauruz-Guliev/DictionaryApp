@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @AllArgsConstructor
-@Transactional
 @NoArgsConstructor
 @Builder
 @Data
@@ -21,7 +20,7 @@ public class WordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column()
+    @Column
     private String text;
 
     @ManyToOne
@@ -31,7 +30,7 @@ public class WordEntity {
     @OneToMany(mappedBy = "word", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageUrlEntity> images = new ArrayList<>();
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "word_type_id")
     private WordTypeEntity type;
 
@@ -39,10 +38,18 @@ public class WordEntity {
     private Long dateAdded;
 
 
-    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(
+            cascade = CascadeType.PERSIST,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
     private List<SynonymEntity> synonyms;
 
-    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(
+            cascade = CascadeType.PERSIST,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
     private List<MeaningEntity> meanings;
 
 }

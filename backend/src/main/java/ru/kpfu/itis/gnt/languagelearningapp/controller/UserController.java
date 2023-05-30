@@ -33,7 +33,6 @@ import java.net.URI;
 })
 public class UserController {
     private final UserService service;
-    private final DictionaryService dictionaryService;
     private final UserAuthProvider provider;
 
     @PostMapping(ApiEndPoints.Authentication.LOGIN)
@@ -68,7 +67,7 @@ public class UserController {
     }
 
     @GetMapping(ApiEndPoints.Authentication.PROFILE)
-    public ResponseEntity<?> getUserInfo(Authentication authentication, DictionaryRepository dictionaryRepository) {
+    public ResponseEntity<?> getUserInfo(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             UserDto user = (UserDto) authentication.getPrincipal();
             return ResponseEntity.ok(service.getUser(user.getId()));

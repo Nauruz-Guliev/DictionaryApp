@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Transactional
 @Data
 @Entity
 @Table(name = "type")

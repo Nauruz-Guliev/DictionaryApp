@@ -13,6 +13,7 @@ public class DictionaryItem {
     private String type;
     private List<String> meaning;
     private List<String> synonyms;
+    private List<String> images;
     private Long id;
     private boolean isFavorite;
 }

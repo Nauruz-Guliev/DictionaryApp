@@ -12,6 +12,5 @@ import java.util.Optional;
 @Repository
 public interface WordTypeRepository extends JpaRepository<WordTypeEntity, Long> {
 
-   @Query("select u from WordTypeEntity u where lower(u.text) like lower(concat('%', :text,'%'))")
-   List<WordTypeEntity> findByTextCaseInsensitive(String text);
+   Optional<WordTypeEntity> findByTextIgnoreCase(String text);
 }

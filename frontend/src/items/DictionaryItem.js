@@ -1,19 +1,25 @@
 import * as React from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import * as AppEndPoints from "../constants/AppEndPoints";
+import {getAuthToken, getUser} from "../auth/axios_helper";
+import {useContext} from "react";
+import {UserContext} from "../context/Context";
 
 
 function Redirect(model) {
     let navigate = useNavigate();
+    let [user, setUser] = useContext(UserContext);
 
     function handleClick() {
-        console.log("CLICKED")
         navigate(AppEndPoints.DICTIONARY, {state: {model: model}})
     }
 
     return (
-        <button className="btn btn-primary" onClick={handleClick}>Open dictionary
-        </button>
+        <div> {getAuthToken() && user &&
+            <button className="btn btn-primary w-100" onClick={handleClick}>Open dictionary
+            </button>
+        }
+        </div>
     );
 }
 
@@ -25,7 +31,6 @@ export class DictionaryItem extends React.Component {
             success: true
         }
     }
-
 
     render() {
         return (

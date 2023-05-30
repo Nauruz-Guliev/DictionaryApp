@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.ApiEndPoints;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.ErrorMessageConstants;
+import ru.kpfu.itis.gnt.languagelearningapp.dto.PaginationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.UserDto;
 import ru.kpfu.itis.gnt.languagelearningapp.model.DictionaryModel;
@@ -72,7 +72,8 @@ public class DictionaryController {
     }
 
     @PostMapping(ApiEndPoints.FAVORITES)
-    public ResponseEntity<?> getFavoritesPaginated(Authentication authentication, ru.kpfu.itis.gnt.languagelearningapp.dto.PaginationModel model) {
+    public ResponseEntity<?> getFavoritesPaginated(Authentication authentication,
+                                                   @RequestBody PaginationDto model) {
         if (authentication != null && authentication.isAuthenticated()) {
             Page<DictionaryItem> paginated = findPaginated(model.getPage(), model.getSize(), (UserDto) authentication.getPrincipal());
             return ResponseEntity.ok(createModel(model.getPage(), paginated));

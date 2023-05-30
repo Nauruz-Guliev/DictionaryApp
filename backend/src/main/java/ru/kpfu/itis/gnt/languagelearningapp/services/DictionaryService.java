@@ -96,6 +96,8 @@ public class DictionaryService {
                     .synonyms(entity.getSynonyms().stream().map(SynonymEntity::getText).toList())
                     // избранный
                     .isFavorite(checkIfFavorite(entity, userDto))
+                    // картинки
+                    .images(entity.getImages().stream().map(ImageUrlEntity::getUrl).toList())
                     .build();
             items.add(item);
         }
@@ -111,12 +113,11 @@ public class DictionaryService {
         List<DictionaryItem> translationList = dictionaryMapper.mapTo(responseTranslation);
         for (DictionaryItem item : translationList) {
             //сначала создаем сущность общую
-            WordEntity wordEntity;
 
-            WordEntity wordEntityList = dictionaryRepository.findByTextAndType(
+            WordEntity wordEntity = dictionaryRepository.findByTextAndType(
                     dto.getText(), item.getType());
 
-            if (wordEntityList != null) {
+            if (wordEntity == null) {
                 wordEntity = WordEntity.builder()
                         // text
                         .text(dto.getText())
@@ -124,16 +125,14 @@ public class DictionaryService {
                         .dateAdded(Calendar.getInstance().getTimeInMillis())
                         // локаль
                         .build();
-            } else {
-                wordEntity = null;
             }
 
             //синонимы
-            List<SynonymEntity> synonyms = getSynonyms(item, wordEntity);
+            List<SynonymEntity> synonyms = getSynonyms(item);
             wordEntity.setSynonyms(synonyms);
 
             //значения
-            List<MeaningEntity> meanings = getMeanings(item, wordEntity);
+            List<MeaningEntity> meanings = getMeanings(item);
             wordEntity.setMeanings(meanings);
 
             //локаль
@@ -146,10 +145,9 @@ public class DictionaryService {
 
             //ссылки на изображения
             List<ImageUrlEntity> imageList = imageService.getImageUrlEntityList(wordEntity, dto.getText(), dto.getFrom().getLanguage());
+            item.setImages(imageList.stream().map(ImageUrlEntity::getUrl).toList());
             wordEntity.setImages(imageList);
-            try {
-                dictionaryRepository.save(wordEntity);
-            } catch (Exception ignored) {}
+            wordEntity = dictionaryRepository.saveAndFlush(wordEntity);
             item.setFavorite(checkIfFavorite(wordEntity, userDto));
             item.setId(wordEntity.getId());
         }
@@ -157,11 +155,13 @@ public class DictionaryService {
     }
 
     private WordTypeEntity getWordType(String text) {
-        try {
-            return wordTypeRepository.findByTextCaseInsensitive(text).get(0);
-        } catch (Exception exception) {
-            return WordTypeEntity.builder().text(text).build();
-        }
+        return wordTypeRepository.findByTextIgnoreCase(text).orElseGet(() -> wordTypeRepository.save(WordTypeEntity.builder().text(text).build()));
+        /* почему-то так не работает
+        return wordTypeRepository.findByTextIgnoreCase(text).orElse(
+                (WordTypeEntity.builder().text(text).build()
+                ));
+
+         */
     }
 
     private boolean checkIfFavorite(WordEntity wordEntity, UserDto userDto) {
@@ -177,19 +177,35 @@ public class DictionaryService {
         );
     }
 
-    private List<SynonymEntity> getSynonyms(DictionaryItem item, WordEntity wordEntity) {
+    private List<SynonymEntity> getSynonyms(DictionaryItem item) {
         try {
-            return item.getSynonyms().stream().map(synonym -> synonymRepository.findByText(synonym).orElse(
-                    SynonymEntity.builder().text(synonym).word(wordEntity).build())).toList();
+            List<SynonymEntity> list = new ArrayList<>();
+            for (String meaning : item.getSynonyms()) {
+                Optional<SynonymEntity> synonymEntity = synonymRepository.findByTextIgnoreCase(meaning);
+                if (synonymEntity.isPresent()) {
+                    list.add(synonymEntity.get());
+                } else {
+                    list.add((SynonymEntity.builder().text(meaning).build()));
+                }
+            }
+            return list;
         } catch (Exception ex) {
             return new ArrayList<>();
         }
     }
 
-    private List<MeaningEntity> getMeanings(DictionaryItem item, WordEntity wordEntity) {
+    private List<MeaningEntity> getMeanings(DictionaryItem item) {
         try {
-            return item.getMeaning().stream().map(meaning -> meaningRepository.findByText(meaning).orElse(
-                    MeaningEntity.builder().text(meaning).word(wordEntity).build())).toList();
+            List<MeaningEntity> list = new ArrayList<>();
+            for (String meaning : item.getMeaning()) {
+                Optional<MeaningEntity> meaningEntity = meaningRepository.findByTextIgnoreCase(meaning);
+                if (meaningEntity.isPresent()) {
+                    list.add(meaningEntity.get());
+                } else {
+                    list.add((MeaningEntity.builder().text(meaning).build()));
+                }
+            }
+            return list;
         } catch (Exception ex) {
             return new ArrayList<>();
         }
@@ -201,7 +217,7 @@ public class DictionaryService {
             UserEntity userEntity = userRepository.findByLogin(userDto.getLogin()).get();
             WordEntity wordEntity = dictionaryRepository.findByTextAndType(item.getOriginalWord(), item.getType());
             userEntity.getWords().add(wordEntity);
-            userRepository.save(userEntity);
+            userRepository.saveAndFlush(userEntity);
             return dictionaryLocalMapper.mapTo(dictionaryRepository.findById(item.getId()).get(), true);
         } catch (Exception exception) {
             throw new DatabaseException(ErrorMessageConstants.INTERNAL.FAVORITE_ADD_FAIL + " due to " + exception.getMessage());
@@ -214,7 +230,7 @@ public class DictionaryService {
             UserEntity userEntity = userRepository.findByLogin(userDto.getLogin()).get();
             WordEntity wordEntity = dictionaryRepository.findByTextAndType(item.getOriginalWord(), item.getType());
             userEntity.getWords().remove(wordEntity);
-            userRepository.save(userEntity);
+            userRepository.saveAndFlush(userEntity);
             return dictionaryLocalMapper.mapTo(dictionaryRepository.findById(item.getId()).get(), false);
         } catch (Exception exception) {
             throw new DatabaseException(ErrorMessageConstants.INTERNAL.FAVORITE_REMOVE_FAIL + " due to " + exception.getMessage());
@@ -223,11 +239,10 @@ public class DictionaryService {
 
     public List<DictionaryItem> getUserWordEntityList(UserDto userDto) {
         try {
-            List<WordEntity> wordEntities = dictionaryRepository.findByIds(userRepository.getFavoriteWordIds(userDto.getId()));
             List<DictionaryItem> list = new ArrayList<>();
-            for (WordEntity wordEntity : wordEntities) {
-                boolean isFavorite = dictionaryRepository.isFavorite(userDto.getId(), wordEntity.getId());
-                list.add(dictionaryLocalMapper.mapTo(wordEntity, isFavorite));
+            UserEntity userEntity = userRepository.findByLogin(userDto.getLogin()).orElseThrow(RuntimeException::new);
+            for (WordEntity wordEntity : userEntity.getWords()) {
+                list.add(dictionaryLocalMapper.mapTo(wordEntity, true));
             }
             return list;
         } catch (Exception exception) {

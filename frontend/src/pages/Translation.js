@@ -1,5 +1,5 @@
 import * as React from "react";
-import {request} from "../auth/axios_helper";
+import {getUser, request} from "../auth/axios_helper";
 import * as ApiEndPoints from "../constants/ApiEndPoints";
 import * as LocaleConstants from "../constants/LocaleConstants";
 import {DictionaryItem} from "../items/DictionaryItem";
@@ -117,7 +117,7 @@ export default class Translation extends React.Component {
                                         <div className="d-flex flex-row align-items-xxl-end">
                                             <p className="small text-muted mb-0 align-text-bottom">{!this.state.data.present && this.state.toLocale}</p>
                                         </div>
-                                        {this.state.data.present && getAuthToken() &&
+                                        {this.state.data.present && getUser() &&
                                             <DictionaryItem model={this.state}/>}
                                     </div>
                                 </div>

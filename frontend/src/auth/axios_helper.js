@@ -1,15 +1,15 @@
 import axios from "axios";
 import * as ApiEndPoints from "../constants/ApiEndPoints";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import * as AppEndPoints from "../constants/AppEndPoints";
+import {UserContext} from "../context/Context";
 
 axios.defaults.baseURL = "http://localhost:8181"
 axios.defaults.headers.post["Content-Type"] = "application/json"
 
 let authTokenKey = "auth_token";
 
-
-export const getAuthToken = () => {
+export function getAuthToken() {
     return window.localStorage.getItem(authTokenKey);
 }
 
@@ -43,7 +43,6 @@ export const request = (method, url, data) => {
             headers: headers,
             url: url,
             data: data,
-            timeout : 30000
         }
     );
 }

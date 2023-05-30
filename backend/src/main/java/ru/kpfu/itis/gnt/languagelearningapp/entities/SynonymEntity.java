@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
 @Transactional
+@Data
 @Entity
 @Table(name = "synonym")
 public class SynonymEntity {
@@ -20,10 +20,8 @@ public class SynonymEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String text;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "word_id")
-    private WordEntity word;
 
 }

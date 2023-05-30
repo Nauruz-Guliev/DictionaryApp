@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface SynonymRepository extends JpaRepository<SynonymEntity, Long> {
 
-    Optional<SynonymEntity> findByText(String text);
+    Optional<SynonymEntity> findByTextIgnoreCase(String text);
 
 }

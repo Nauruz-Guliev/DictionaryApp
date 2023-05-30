@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface MeaningRepository extends JpaRepository<MeaningEntity, Long> {
-    Optional<MeaningEntity> findByText(String text);
+    Optional<MeaningEntity> findByTextIgnoreCase(String text);
 }

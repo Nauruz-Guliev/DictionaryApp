@@ -35,7 +35,7 @@ class DictionaryScreen extends React.Component {
 
     componentDidMount() {
         try {
-            request("POST", ApiEndPoints.DICTIONARY, {
+            this.props.model && request("POST", ApiEndPoints.DICTIONARY, {
                 text: this.state.model.text, from: this.state.model.fromLocale, to: this.state.model.toLocale,
             })
                 .then((response) => {
@@ -72,11 +72,11 @@ class DictionaryScreen extends React.Component {
         const items = this.state.data.dictionary;
         if (!items) return;
         const listItems = items.map((word) => <div className="card w-100 mt-2">
-                <div className="row">
+                <div className="row ps-3 pe-3">
                     <SubItems items={word.synonyms} title={"Synonyms"}/>
                     <SubItems items={word.meaning} title={"Meaning"}/>
                     <div className="w-50 h-25  justify-content-center">
-                        <ImageCarousel items={this.state.data.imageUrls}/>
+                        {word.images != null && <ImageCarousel items={word.images}/>}
                         <button type="button" id="favoriteButton"
                                 className={word.favorite ? "btn btn-warning align-self-start p-1" : "btn btn-secondary align-self-start p-1"}
                                 onClick={() => {
