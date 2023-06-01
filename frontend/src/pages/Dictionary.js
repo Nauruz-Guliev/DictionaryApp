@@ -101,7 +101,7 @@ class DictionaryScreen extends React.Component {
         return (
             <div>
                 {listItems}
-                {this.state.navigateToError && getAuthToken() && <Navigate to={AppEndPoints.HOME} replace={true}/>}
+                {this.state.navigateToError && <Navigate to={AppEndPoints.HOME} replace={true}/>}
             </div>
         )
     }

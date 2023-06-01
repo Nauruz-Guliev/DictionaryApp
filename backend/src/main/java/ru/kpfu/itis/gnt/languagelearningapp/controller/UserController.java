@@ -2,7 +2,6 @@ package ru.kpfu.itis.gnt.languagelearningapp.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +13,9 @@ import ru.kpfu.itis.gnt.languagelearningapp.dto.CredentialsDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.SignUpDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.UserDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.UserUpdateDto;
-import ru.kpfu.itis.gnt.languagelearningapp.model.DictionaryModel;
-import ru.kpfu.itis.gnt.languagelearningapp.model.ErrorModel;
-import ru.kpfu.itis.gnt.languagelearningapp.model.SuccessModel;
-import ru.kpfu.itis.gnt.languagelearningapp.model.dictionary.DictionaryItem;
-import ru.kpfu.itis.gnt.languagelearningapp.repository.DictionaryRepository;
+import ru.kpfu.itis.gnt.languagelearningapp.dto.ErrorDto;
+import ru.kpfu.itis.gnt.languagelearningapp.dto.SuccessDto;
 import ru.kpfu.itis.gnt.languagelearningapp.security.UserAuthProvider;
-import ru.kpfu.itis.gnt.languagelearningapp.services.DictionaryService;
 import ru.kpfu.itis.gnt.languagelearningapp.services.UserService;
 
 import java.net.URI;
@@ -47,7 +42,7 @@ public class UserController {
         if (authentication != null && authentication.isAuthenticated()) {
             UserDto userDto = (UserDto) authentication.getPrincipal();
             service.removeUser(userDto.getId());
-            return ResponseEntity.ok(SuccessModel.builder().build());
+            return ResponseEntity.ok(SuccessDto.builder().build());
         } else {
             return createNotAuthenticatedMessage();
         }
@@ -77,7 +72,7 @@ public class UserController {
     }
 
     private ResponseEntity<?> createNotAuthenticatedMessage() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorModel.builder()
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorDto.builder()
                 .message(
                         ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE
                 ).status(HttpStatus.FORBIDDEN.toString()).build());

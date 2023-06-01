@@ -12,5 +12,6 @@ import java.util.Optional;
 @Repository
 public interface WordTypeRepository extends JpaRepository<WordTypeEntity, Long> {
 
+
    Optional<WordTypeEntity> findByTextIgnoreCase(String text);
 }

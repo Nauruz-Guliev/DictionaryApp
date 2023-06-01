@@ -10,14 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.kpfu.itis.gnt.languagelearningapp.api.translation.models.TranslationResponse;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.ApiEndPoints;
-import ru.kpfu.itis.gnt.languagelearningapp.dto.CredentialsDto;
-import ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto;
-import ru.kpfu.itis.gnt.languagelearningapp.model.TranslationModel;
+import ru.kpfu.itis.gnt.languagelearningapp.model.TranslationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.services.TranslationService;
-
-import java.util.Locale;
 
 @RestController
 @RequestMapping(value = "api/v1/")
@@ -33,12 +28,13 @@ public class TranslationController {
             @ApiResponse(responseCode = "200", description = "Перевод слов",
                     content = {
                             @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = TranslationModel.class))
+                                    schema = @Schema(implementation = TranslationDto.class))
                     }
             )
     })
     @PostMapping(ApiEndPoints.TRANSLATE)
-    public ResponseEntity<TranslationModel> getTranslation(@RequestBody TranslationDto translationDto) {
+    public ResponseEntity<TranslationDto> getTranslation(@RequestBody ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto translationDto) {
+
         return ResponseEntity.ok(translationService.getTranslation(
                 translationDto
         ));

@@ -12,9 +12,8 @@ import ru.kpfu.itis.gnt.languagelearningapp.dto.UserUpdateDto;
 import ru.kpfu.itis.gnt.languagelearningapp.entities.UserEntity;
 import ru.kpfu.itis.gnt.languagelearningapp.exception.AuthenticationException;
 import ru.kpfu.itis.gnt.languagelearningapp.exception.InvalidFieldDataException;
-import ru.kpfu.itis.gnt.languagelearningapp.mappers.mapstruct.UserMapper;
+import ru.kpfu.itis.gnt.languagelearningapp.mappers.UserMapper;
 import ru.kpfu.itis.gnt.languagelearningapp.repository.UserRepository;
-import ru.kpfu.itis.gnt.languagelearningapp.repository.DictionaryRepository;
 
 import java.nio.CharBuffer;
 import java.util.Optional;

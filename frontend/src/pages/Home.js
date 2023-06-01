@@ -11,8 +11,8 @@ export default class Home extends React.Component {
         }
     }
     componentDidMount() {
-        /*
-        request("GET", "/test", {
+
+        request("GET", ApiEndPoints.WORD, {
         })
             .then((response) => {
                 try {
@@ -24,20 +24,17 @@ export default class Home extends React.Component {
             }).catch((error) => {
             console.log(error)
         })
-
-         */
     }
     render() {
         return (
             <div className="cover-container d-flex h-100 p-3 mx-auto flex-column">
                 <header className="masthead mb-auto">
                     <div className="inner">
-                        <h3 className="masthead-brand"> { this.state.data && this.state.data.length > 0 && <p>{this.state.data[0]}</p> } </h3>
+                        <h3 className="masthead-brand"> { this.state.data && this.state.data.length > 0 && <p> Word of the day: {this.state.data}</p> } </h3>
                     </div>
                 </header>
 
                 <main role="main" className="inner cover">
-                    <h1 className="cover-heading">Cover your page.</h1>
                     <p className="lead mt-5">
                         <a href={EndPoints.TRANSLATION} className="btn btn-lg btn-secondary">Learn more words</a>
                     </p>

@@ -10,7 +10,8 @@ import ru.kpfu.itis.gnt.languagelearningapp.api.image.models.ImageResponse;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.QualifierConstants;
 import ru.kpfu.itis.gnt.languagelearningapp.entities.ImageUrlEntity;
 import ru.kpfu.itis.gnt.languagelearningapp.entities.WordEntity;
-import ru.kpfu.itis.gnt.languagelearningapp.mappers.custom.ImageUrlListMapper;
+import ru.kpfu.itis.gnt.languagelearningapp.exception.LLAPPException;
+import ru.kpfu.itis.gnt.languagelearningapp.mappers.ImageUrlListMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,16 @@ public class ImageService {
         this.imageRetrofit = imageRetrofit;
         this.dictionaryRetrofit = dictionaryRetrofit;
         this.imageMapper = imageMapper;
+    }
+
+    public List<String> getImages(String word) {
+        try {
+            ImageApi imageApi = imageRetrofit.create(ImageApi.class);
+            ImageResponse response = imageApi.getImageResponse(word).execute().body();
+            return imageMapper.mapTo(response);
+        } catch (Exception ex) {
+            throw new LLAPPException(ex.getMessage());
+        }
     }
 
 

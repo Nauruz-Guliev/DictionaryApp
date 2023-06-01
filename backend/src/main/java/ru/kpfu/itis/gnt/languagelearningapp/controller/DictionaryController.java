@@ -17,13 +17,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.ApiEndPoints;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.ErrorMessageConstants;
-import ru.kpfu.itis.gnt.languagelearningapp.dto.PaginationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.UserDto;
-import ru.kpfu.itis.gnt.languagelearningapp.model.DictionaryModel;
-import ru.kpfu.itis.gnt.languagelearningapp.model.ErrorModel;
-import ru.kpfu.itis.gnt.languagelearningapp.model.PaginationModel;
+import ru.kpfu.itis.gnt.languagelearningapp.dto.DictionaryDto;
+import ru.kpfu.itis.gnt.languagelearningapp.dto.ErrorDto;
+import ru.kpfu.itis.gnt.languagelearningapp.model.PaginationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.model.dictionary.DictionaryItem;
+import ru.kpfu.itis.gnt.languagelearningapp.repository.DictionaryRepository;
 import ru.kpfu.itis.gnt.languagelearningapp.services.DictionaryService;
 
 import java.util.List;
@@ -36,6 +36,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DictionaryController {
     private final DictionaryService dictionaryService;
+    private final DictionaryRepository repository;
+
 
 
     @Operation(summary = "Словарь")
@@ -43,19 +45,20 @@ public class DictionaryController {
             @ApiResponse(responseCode = "200", description = "Словарное значение",
                     content = {
                             @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = DictionaryModel.class))
+                                    schema = @Schema(implementation = DictionaryDto.class))
                     }
             )
     })
     @PostMapping(ApiEndPoints.DICTIONARY)
     public ResponseEntity<?> getDictionary(@RequestBody TranslationDto dto, Authentication authentication) {
+        System.err.println(repository.findWordWithMostMeanings());
         if (authentication != null && authentication.isAuthenticated()) {
-            DictionaryModel dictionaryModel = dictionaryService.getDictionaryModel(
+            DictionaryDto dictionaryDto = dictionaryService.getDictionaryModel(
                     dto, (UserDto) authentication.getPrincipal()
             );
-            return ResponseEntity.ok(dictionaryModel);
+            return ResponseEntity.ok(dictionaryDto);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorModel.builder().status(HttpStatus.FORBIDDEN.toString()).message(ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorDto.builder().status(HttpStatus.FORBIDDEN.toString()).message(ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE));
         }
     }
 
@@ -67,18 +70,18 @@ public class DictionaryController {
             );
             return ResponseEntity.ok(dictionaryItems);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorModel.builder().status(HttpStatus.FORBIDDEN.toString()).message(ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorDto.builder().status(HttpStatus.FORBIDDEN.toString()).message(ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE));
         }
     }
 
     @PostMapping(ApiEndPoints.FAVORITES)
     public ResponseEntity<?> getFavoritesPaginated(Authentication authentication,
-                                                   @RequestBody PaginationDto model) {
+                                                   @RequestBody ru.kpfu.itis.gnt.languagelearningapp.dto.PaginationDto model) {
         if (authentication != null && authentication.isAuthenticated()) {
             Page<DictionaryItem> paginated = findPaginated(model.getPage(), model.getSize(), (UserDto) authentication.getPrincipal());
             return ResponseEntity.ok(createModel(model.getPage(), paginated));
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorModel.builder().status(HttpStatus.FORBIDDEN.toString()).message(ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorDto.builder().status(HttpStatus.FORBIDDEN.toString()).message(ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE));
         }
     }
 
@@ -103,13 +106,18 @@ public class DictionaryController {
         }
     }
 
+    @GetMapping(ApiEndPoints.WORD)
+    public ResponseEntity<String> getWord() {
+        return ResponseEntity.ok(dictionaryService.getWord());
+    }
+
     private Page<DictionaryItem> findPaginated(int page, int pageSize, UserDto userDto) {
         Pageable pageable = PageRequest.of(page, pageSize <= 1 ? 5 : pageSize);
         return dictionaryService.getUserWordEntityList(pageable, userDto);
     }
 
-    private PaginationModel createModel(int page, Page<DictionaryItem> paginated) {
-        return PaginationModel.builder()
+    private PaginationDto createModel(int page, Page<DictionaryItem> paginated) {
+        return PaginationDto.builder()
                 .currentPage((long) page)
                 .totalPages((long) paginated.getTotalPages())
                 .itemPage(paginated.getContent())
@@ -117,8 +125,10 @@ public class DictionaryController {
                 .build();
     }
 
+
+
     private ResponseEntity<?> createNotAuthenticatedMessage() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorModel.builder()
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorDto.builder()
                 .message(
                         ErrorMessageConstants.NOT_AUTHORIZED.ERROR_MESSAGE
                 ).status(HttpStatus.FORBIDDEN.toString()).build());

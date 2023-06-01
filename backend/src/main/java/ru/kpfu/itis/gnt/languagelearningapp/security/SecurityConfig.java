@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import ru.kpfu.itis.gnt.languagelearningapp.constants.ApiEndPoints;
 
 import java.io.IOException;
 
@@ -37,7 +38,8 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests((requests) ->
-                        requests.requestMatchers("/messages").authenticated()
+                        requests.requestMatchers(ApiEndPoints.FAVORITES).authenticated()
+                                .requestMatchers(ApiEndPoints.DICTIONARY).authenticated()
                                 .anyRequest().permitAll()
 
                 );

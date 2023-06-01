@@ -11,6 +11,8 @@ public class ApiEndPoints {
     public static final String TRANSLATE = "/translate";
 
     public static final String DICTIONARY = "/dictionary";
+    public static final String WORD = "/word";
+
 
     public static final String FAVORITES = "/dictionary/favorites";
 

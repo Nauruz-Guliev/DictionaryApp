@@ -13,9 +13,9 @@ import ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.dto.UserDto;
 import ru.kpfu.itis.gnt.languagelearningapp.entities.*;
 import ru.kpfu.itis.gnt.languagelearningapp.exception.DatabaseException;
-import ru.kpfu.itis.gnt.languagelearningapp.mappers.custom.DictionaryMapper;
-import ru.kpfu.itis.gnt.languagelearningapp.mappers.custom.DictionaryYandexApiResponseMapper;
-import ru.kpfu.itis.gnt.languagelearningapp.model.DictionaryModel;
+import ru.kpfu.itis.gnt.languagelearningapp.mappers.DictionaryMapper;
+import ru.kpfu.itis.gnt.languagelearningapp.mappers.DictionaryYandexApiResponseMapper;
+import ru.kpfu.itis.gnt.languagelearningapp.dto.DictionaryDto;
 import ru.kpfu.itis.gnt.languagelearningapp.model.dictionary.DictionaryItem;
 import ru.kpfu.itis.gnt.languagelearningapp.repository.*;
 
@@ -61,8 +61,8 @@ public class DictionaryService {
         this.audioService = audioService;
     }
 
-    public DictionaryModel getDictionaryModel(TranslationDto dto, UserDto userDto) {
-        DictionaryModel model = new DictionaryModel();
+    public DictionaryDto getDictionaryModel(TranslationDto dto, UserDto userDto) {
+        DictionaryDto model = new DictionaryDto();
         // получаем перевод. Если не получили - исключение
         model.setDictionary(getDictionaryItems(dto, userDto));
         // получаем аудио
@@ -114,7 +114,7 @@ public class DictionaryService {
         for (DictionaryItem item : translationList) {
             //сначала создаем сущность общую
 
-            WordEntity wordEntity = dictionaryRepository.findByTextAndType(
+            WordEntity wordEntity = dictionaryRepository.findByTextIgnoreCaseAndType(
                     dto.getText(), item.getType());
 
             if (wordEntity == null) {
@@ -156,12 +156,6 @@ public class DictionaryService {
 
     private WordTypeEntity getWordType(String text) {
         return wordTypeRepository.findByTextIgnoreCase(text).orElseGet(() -> wordTypeRepository.save(WordTypeEntity.builder().text(text).build()));
-        /* почему-то так не работает
-        return wordTypeRepository.findByTextIgnoreCase(text).orElse(
-                (WordTypeEntity.builder().text(text).build()
-                ));
-
-         */
     }
 
     private boolean checkIfFavorite(WordEntity wordEntity, UserDto userDto) {
@@ -170,7 +164,7 @@ public class DictionaryService {
 
 
     private LocaleEntity getLocale(Locale locale) {
-        return localeRepository.findByTextCaseInsensitive(locale.toString()).orElse(
+        return localeRepository.findByTextIgnoreCase(locale.toString()).orElse(
                 LocaleEntity.builder()
                         .text(locale.toString())
                         .build()
@@ -215,7 +209,7 @@ public class DictionaryService {
     public DictionaryItem addFavorite(DictionaryItem item, UserDto userDto) {
         try {
             UserEntity userEntity = userRepository.findByLogin(userDto.getLogin()).get();
-            WordEntity wordEntity = dictionaryRepository.findByTextAndType(item.getOriginalWord(), item.getType());
+            WordEntity wordEntity = dictionaryRepository.findByTextIgnoreCaseAndType(item.getOriginalWord(), item.getType());
             userEntity.getWords().add(wordEntity);
             userRepository.saveAndFlush(userEntity);
             return dictionaryLocalMapper.mapTo(dictionaryRepository.findById(item.getId()).get(), true);
@@ -228,7 +222,7 @@ public class DictionaryService {
     public DictionaryItem deleteFavorite(DictionaryItem item, UserDto userDto) {
         try {
             UserEntity userEntity = userRepository.findByLogin(userDto.getLogin()).get();
-            WordEntity wordEntity = dictionaryRepository.findByTextAndType(item.getOriginalWord(), item.getType());
+            WordEntity wordEntity = dictionaryRepository.findByTextIgnoreCaseAndType(item.getOriginalWord(), item.getType());
             userEntity.getWords().remove(wordEntity);
             userRepository.saveAndFlush(userEntity);
             return dictionaryLocalMapper.mapTo(dictionaryRepository.findById(item.getId()).get(), false);
@@ -261,5 +255,10 @@ public class DictionaryService {
         } catch (Exception ex) {
             throw new DatabaseException(ErrorMessageConstants.INTERNAL.PAGING_FAILED);
         }
+    }
+
+    public String getWord() {
+        Optional<String> word = dictionaryRepository.findWordWithMostMeanings();
+        return word.orElse("No words yet.");
     }
 }

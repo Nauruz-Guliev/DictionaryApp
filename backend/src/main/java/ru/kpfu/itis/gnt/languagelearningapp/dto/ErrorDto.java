@@ -1,17 +1,16 @@
 package ru.kpfu.itis.gnt.languagelearningapp.dto;
 
 
-import lombok.*;
-
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Data
+@Builder
 public class ErrorDto {
-
     private String status;
     private String message;
-
 }

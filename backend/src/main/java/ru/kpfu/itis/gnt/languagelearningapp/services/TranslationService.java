@@ -11,14 +11,14 @@ import ru.kpfu.itis.gnt.languagelearningapp.api.translation.models.TranslationRe
 import ru.kpfu.itis.gnt.languagelearningapp.api.translation.models.TranslationResponse;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.ErrorMessageConstants;
 import ru.kpfu.itis.gnt.languagelearningapp.constants.QualifierConstants;
-import ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.entities.LocaleEntity;
 import ru.kpfu.itis.gnt.languagelearningapp.entities.TranslationEntity;
 import ru.kpfu.itis.gnt.languagelearningapp.exception.ResourceNotFoundException;
-import ru.kpfu.itis.gnt.languagelearningapp.model.TranslationModel;
+import ru.kpfu.itis.gnt.languagelearningapp.model.TranslationDto;
 import ru.kpfu.itis.gnt.languagelearningapp.repository.LocaleRepository;
 import ru.kpfu.itis.gnt.languagelearningapp.repository.TranslationRepository;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -43,14 +43,14 @@ public class TranslationService {
         this.translationRetrofit = translationRetrofit;
     }
 
-    public TranslationModel getTranslation(TranslationDto translationDto) {
+    public TranslationDto getTranslation(ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto translationDto) {
         System.out.println(translationDto);
-        TranslationModel model = getTranslationModel(translationDto);
+        TranslationDto model = getTranslationModel(translationDto);
         model.setPresent(checkIfDictionaryExists(translationDto));
         return model;
     }
 
-    private boolean checkIfDictionaryExists(TranslationDto translationDto) {
+    private boolean checkIfDictionaryExists(ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto translationDto) {
         try {
             YandexDictionaryResponse dictionaryApi = dictionaryRetrofit.create(DictionaryApi.class).getTranslation(
                     translationDto.getFrom().getLanguage() + "-" + translationDto.getTo().getLanguage(), translationDto.getText()
@@ -61,10 +61,11 @@ public class TranslationService {
         }
     }
 
-    private TranslationModel getTranslationModel(TranslationDto translationDto) {
-        saveLocale(translationDto);
-        Optional<TranslationEntity> translationEntity = translationRepository.findByTextCaseInsensitive(translationDto.getText());
-        TranslationModel model = new TranslationModel();
+    private TranslationDto getTranslationModel(ru.kpfu.itis.gnt.languagelearningapp.dto.TranslationDto translationDto) {
+        saveLocale(translationDto.getFrom());
+        saveLocale(translationDto.getTo());
+        Optional<TranslationEntity> translationEntity = translationRepository.findByOriginalIgnoreCase(translationDto.getText());
+        TranslationDto model = new TranslationDto();
         if (translationEntity.isEmpty()) {
             try {
                 TranslationApi translationApi = translationRetrofit.create(TranslationApi.class);
@@ -79,7 +80,7 @@ public class TranslationService {
                     model.setResult(translationResponse.getResult());
                 }
                 model.setAudio(audioService.loadAudioRemote(translationDto, model.getResult()));
-                translationRepository.findByTextCaseInsensitive(translationDto.getText()).orElse(
+                translationRepository.findByOriginalIgnoreCase(translationDto.getText()).orElse(
                         translationRepository.save(TranslationEntity.builder()
                                 .translation(model.getResult()).original(translationDto.getText()).audio(model.getAudio()).build())
                 );
@@ -94,15 +95,11 @@ public class TranslationService {
         }
     }
 
-    private void saveLocale(TranslationDto translationDto) {
-        try {
+    private void saveLocale(Locale locale) {
+        if (localeRepository.findByTextIgnoreCase(locale.toString()).isEmpty()) {
             localeRepository.save(LocaleEntity.builder()
-                    .text(translationDto.getFrom().toString())
+                    .text(locale.toString())
                     .build());
-            localeRepository.save(LocaleEntity.builder()
-                    .text(translationDto.getTo().toString())
-                    .build());
-        } catch (Exception ignored) {
         }
     }
 }

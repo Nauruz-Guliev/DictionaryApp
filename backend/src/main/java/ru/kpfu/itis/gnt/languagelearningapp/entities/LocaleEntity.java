@@ -22,6 +22,4 @@ public class LocaleEntity {
     private Long id;
     @Column(unique = true)
     private String text;
-    
-
 }

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Data
 @Transactional
@@ -27,4 +26,7 @@ public class TranslationEntity {
 
     private byte[] audio;
 
+    public TranslationEntity() {
+
+    }
 }

@@ -6,4 +6,5 @@ export const DICTIONARY = "/api/v1/dictionary"
 export const ADD_FAVORITE = "/api/v1/favorites/add"
 export const REMOVE_FAVORITE = "/api/v1/favorites/remove"
 export const DICTIONARY_FAVORITES = "/api/v1/dictionary/favorites"
+export const WORD = "/api/v1/word"
 
